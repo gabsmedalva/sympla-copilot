@@ -43,9 +43,20 @@ Quando o CEO perguntar sobre "evolução", "crescimento", "queda" ou "comparativ
    - Histórico (Realizado): Tudo até Fev/2034 deve usar o filtro `flag_previsao = 0`.
    - Projeção (Forecast): Tudo de Março/2034 até Dez/2034 deve usar o filtro `flag_previsao = 1`.
 
+REGRAS DA MATRIZ BCG (ESTRATÉGIA DE PORTFÓLIO):
+Quando o CEO mencionar "Matriz BCG", "Estrelas", "Vacas Leiteiras", "Interrogações" ou "Abacaxis/Cães", você deve construir a query SQL calculando os dois eixos da matriz para a dimensão solicitada (Estados, Categorias de Evento ou Produtores):
+- EIXO DE VOLUME (Share): A soma total de `vr_venda` em Fev/2034.
+- EIXO DE CRESCIMENTO (Growth): O crescimento percentual YoY (Fev/2034 vs Fev/2033).
+Use CTEs para calcular a média geral de volume e de crescimento. A classificação segue a regra:
+- ESTRELA (Star): Volume ACIMA da média e Crescimento ACIMA da média.
+- VACA LEITEIRA (Cash Cow): Volume ACIMA da média e Crescimento ABAIXO da média.
+- INTERROGAÇÃO (Question Mark): Volume ABAIXO da média e Crescimento ACIMA da média.
+- ABACAXI/CÃO (Dog): Volume ABAIXO da média e Crescimento ABAIXO da média.
+O SQL deve retornar as colunas: Nome da Dimensão, Volume, % Crescimento e a Classificação BCG.
+
 REGRAS DE DECISÃO DE ROTEAMENTO (MUITO IMPORTANTE):
-1. Se a pergunta exigir DADOS do banco (ex: "Qual estado vendeu mais?", "Comparativo de vendas YoY"), retorne APENAS o código SQL puro. Sem formatação markdown (```sql) e sem explicações extras. Apenas o código.
-2. Se a pergunta NÃO exigir consulta ao banco (ex: "Olá", "Tudo bem?"), retorne EXATAMENTE a palavra: TEXTO_COMUM
+1. Se a pergunta exigir DADOS do banco (ex: "Qual estado vendeu mais?", "Comparativo de vendas YoY", "Construa a Matriz BCG dos eventos"), retorne APENAS o código SQL puro. Sem formatação markdown (```sql) e sem explicações extras. Apenas o código.
+2. Se a pergunta NÃO exigir consulta ao banco (ex: "Olá", "Tudo bem?", "Como você pode me ajudar?"), retorne EXATAMENTE a palavra: TEXTO_COMUM
 """
 
 # 4. Motor do Chat (Atualizado com Lógica de Desvio)
@@ -66,7 +77,7 @@ if pergunta_usuario:
         with st.spinner("Respondendo diretamente..."):
             resposta_direta = client_genai.models.generate_content(
                 model='gemini-2.5-pro',
-                contents=f"O CEO disse: '{pergunta_usuario}'. Responda de forma executiva, amigável e educada. Lembre-se que você é o Copiloto de Inteligência da Sympla e analisa dados de negócios."
+                contents=f"Você é o Copiloto de Inteligência Sênior da Sympla. O CEO (seu chefe) acabou de dizer: '{pergunta_usuario}'. Responda DIRETAMENTE a ele em primeira pessoa, de forma executiva, breve e natural. Não crie opções de resposta, não explique o que está fazendo. Apenas assuma o personagem e responda."
             )
             st.chat_message("assistant").write(resposta_direta.text)
             
